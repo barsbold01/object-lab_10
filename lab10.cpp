@@ -2,328 +2,241 @@
 #include <cmath>
 #include <cstdlib>
 #include <ctime>
+#include <string>
 
 using namespace std;
 
-// =====================================================
-// 1-р хүн хийх хэсэг:
-// Template LinkedList классын үндсэн бүтэц
-// add, insert, get, delete, length функцуудыг бүрэн хэрэгжүүлнэ.
-// =====================================================
-
 template <class T>
-class LinkedList {
+class LinkedList{
 private:
-    struct Node {
+    class Node{
+    public:
         T data;
         Node* next;
-
         Node(T value) {
             data = value;
             next = nullptr;
         }
     };
-
     Node* head;
     int size;
 
 public:
-    LinkedList() {
+    LinkedList(){
         head = nullptr;
         size = 0;
     }
-
-    ~LinkedList() {
-        while (head != nullptr) {
-            Node* temp = head;
-            head = head->next;
-            delete temp;
-        }
-    }
-
-    void add(T t) {
+    void add(T t){
         Node* newNode = new Node(t);
-
-        if (head == nullptr) {
+        if (head == nullptr){
             head = newNode;
-        } else {
+        } 
+        else{
             Node* current = head;
             while (current->next != nullptr) {
                 current = current->next;
             }
             current->next = newNode;
         }
-
         size++;
     }
-
     void insert(T t, int index) {
-        if (index < 0 || index > size) {
-            cout << "Index buruu baina!" << endl;
-            return;
-        }
-
         Node* newNode = new Node(t);
-
-        if (index == 0) {
+        if (index == 0){
             newNode->next = head;
             head = newNode;
-        } else {
+        } 
+        else{
             Node* current = head;
-
             for (int i = 0; i < index - 1; i++) {
                 current = current->next;
             }
-
             newNode->next = current->next;
             current->next = newNode;
         }
-
         size++;
     }
-
     T get(int index) {
         if (index < 0 || index >= size) {
             cout << "Index buruu baina!" << endl;
             return nullptr;
         }
-
         Node* current = head;
-
         for (int i = 0; i < index; i++) {
             current = current->next;
         }
-
         return current->data;
     }
-
     void deleteAt(int index) {
         if (index < 0 || index >= size) {
             cout << "Index buruu baina!" << endl;
             return;
         }
-
         Node* temp;
-
-        if (index == 0) {
+        if (index == 0){
             temp = head;
             head = head->next;
-        } else {
+        } 
+        else{
             Node* current = head;
-
             for (int i = 0; i < index - 1; i++) {
                 current = current->next;
             }
-
             temp = current->next;
             current->next = temp->next;
         }
-
         delete temp;
         size--;
     }
-
     int length() {
         return size;
     }
-
-    void swapData(int i, int j) {
+    void swap(int i, int j) {
         T temp = get(i);
         Node* nodeI = head;
         Node* nodeJ = head;
-
         for (int a = 0; a < i; a++) nodeI = nodeI->next;
         for (int b = 0; b < j; b++) nodeJ = nodeJ->next;
-
         nodeI->data = nodeJ->data;
         nodeJ->data = temp;
     }
 };
-
-
-// =====================================================
-// 2-р хүн хийх хэсэг:
-// Lab7 дээрх Shape, Shape2D, Circle, Square, Triangle классуудыг
-// шинэ даалгаварт тохируулж цэвэрхэн бичнэ.
-// area(), perimeter(), print() функцуудыг override хийж хэрэгжүүлнэ.
-// =====================================================
 
 class Shape {
 protected:
     string name;
 
 public:
-    Shape(string n = "Unknown") {
-        name = n;
-    }
-
-    virtual double area() = 0;
-    virtual double perimeter() = 0;
-
-    string getName() {
-        return name;
-    }
-
-    virtual void print() {
-        cout << "Shape: " << name << endl;
-        cout << "Area: " << area() << endl;
-        cout << "Perimeter: " << perimeter() << endl;
-    }
-
-    virtual ~Shape() {}
+    Shape(string n) : name(n) {}
+    string ner() const { return name; }
 };
 
-class Shape2D : public Shape {
+class TwoDShape : public Shape {
 protected:
-    double x, y;
+    double urt;
+    double x;
+    double y;
 
 public:
-    Shape2D(string n, double x0, double y0)
-        : Shape(n), x(x0), y(y0) {}
+    TwoDShape(string n, double x, double y, double r) : Shape(n), x(x), y(y), urt(r) {}
+    virtual double talbai() = 0;
+    virtual double perimeter() = 0;
+    virtual string turul() = 0;
 };
 
-class Circle : public Shape2D {
-private:
-    double radius;
-
+class Circle : public TwoDShape {
 public:
-    Circle(double x, double y, double r)
-        : Shape2D("Circle", x, y), radius(r) {}
-
-    double area() override {
-        return 3.14159 * radius * radius;
+    Circle(string n, double tuvX, double tuvY, double r) : TwoDShape(n, tuvX, tuvY, r) {}
+    double talbai() override {
+        return urt * urt * M_PI;
     }
-
     double perimeter() override {
-        return 2 * 3.14159 * radius;
+        return urt * M_PI * 2;
     }
-
-    void print() override {
-        cout << "Circle" << endl;
-        cout << "Radius: " << radius << endl;
-        cout << "Area: " << area() << endl;
-        cout << "Perimeter: " << perimeter() << endl;
-        cout << "------------------------" << endl;
+    string turul() override {
+        return "Toirog";
     }
 };
 
-class Square : public Shape2D {
+class Square : public TwoDShape {
 private:
-    double side;
+    double sx[4];
+    double sy[4];
 
 public:
-    Square(double x, double y, double s)
-        : Shape2D("Square", x, y), side(s) {}
-
-    double area() override {
-        return side * side;
+    Square(string n, double zahX, double zahY, double side) : TwoDShape(n,zahX, zahY, side){
+        sx[0] = zahX;
+        sy[0] = zahY;
+        sx[1] = zahX + side;
+        sy[1] = zahY;
+        sx[2] = zahX;
+        sy[2] = zahY - side;
+        sx[3] = zahX + side;
+        sy[3] = zahY - side;
     }
-
+    double talbai() override {
+        return urt * urt;
+    }
     double perimeter() override {
-        return 4 * side;
+        return 4 * urt;
     }
-
-    void print() override {
-        cout << "Square" << endl;
-        cout << "Side: " << side << endl;
-        cout << "Area: " << area() << endl;
-        cout << "Perimeter: " << perimeter() << endl;
-        cout << "------------------------" << endl;
+    string turul() override {
+        return "Kvadrat";
     }
 };
 
-class Triangle : public Shape2D {
+class Triangle : public TwoDShape {
 private:
-    double side;
-
+    double tx[3];
+    double ty[3];
+    double undur;
+    
 public:
-    Triangle(double x, double y, double s)
-        : Shape2D("Triangle", x, y), side(s) {}
-
-    double area() override {
-        return (sqrt(3) / 4) * side * side;
+    Triangle(string n, double deedX, double deedY, double side) : TwoDShape(n, deedX, deedY, side) {
+        undur = side * (sqrt(3.0) / 2.0);
+        tx[0] = deedX;
+        ty[0] = deedY;
+        tx[1] = deedX - (side / 2.0);
+        ty[1] = deedY - undur;
+        tx[2] = deedX + (side / 2.0);
+        ty[2] = deedY - undur;
     }
-
+    double talbai() override {
+        return urt * undur / 2.0;
+    }
     double perimeter() override {
-        return 3 * side;
+        return 3 * urt;
     }
-
-    void print() override {
-        cout << "Triangle" << endl;
-        cout << "Side: " << side << endl;
-        cout << "Area: " << area() << endl;
-        cout << "Perimeter: " << perimeter() << endl;
-        cout << "------------------------" << endl;
+    string turul() override {
+        return "Gurvaljin";
     }
 };
 
-
-// =====================================================
-// 3-р хүн хийх хэсэг:
-// main функц дээр 20-30 санамсаргүй дүрс үүсгэнэ.
-// LinkedList<Shape*> ашиглан хадгална.
-// Дүрсүүдийг төрөл харгалзахгүйгээр area()-аар эрэмбэлж хэвлэнэ.
-// =====================================================
-
-void sortByArea(LinkedList<Shape*>& list) {
+void sort(LinkedList<TwoDShape*>& list) {
     int n = list.length();
-
     for (int i = 0; i < n - 1; i++) {
         for (int j = 0; j < n - i - 1; j++) {
-            Shape* a = list.get(j);
-            Shape* b = list.get(j + 1);
-
-            if (a->area() > b->area()) {
-                list.swapData(j, j + 1);
+            TwoDShape* a = list.get(j);
+            TwoDShape* b = list.get(j + 1);
+            if (a->talbai() < b->talbai()) {
+                list.swap(j, j + 1);
             }
         }
     }
 }
 
 int main() {
-    srand(time(0));
-
-    LinkedList<Shape*> shapes;
-
+    LinkedList<TwoDShape*> shapes;
     int count = 20 + rand() % 11; 
-    // 20-30 ширхэг дүрс санамсаргүй үүсгэнэ
-
+    int countCircle = 0, countSquare = 0, countTriangle = 0;
     for (int i = 0; i < count; i++) {
         int type = rand() % 3;
         double x = rand() % 100;
         double y = rand() % 100;
         double side = 1 + rand() % 20;
-
-        if (type == 0) {
-            shapes.add(new Circle(x, y, side));
+        if (type == 0){
+            countCircle++;
+            shapes.add(new Circle("Circle: " + to_string(countCircle), x, y, side));
         } 
-        else if (type == 1) {
-            shapes.add(new Square(x, y, side));
-        } 
-        else {
-            shapes.add(new Triangle(x, y, side));
+        else if (type == 1){
+            countSquare++;
+            shapes.add(new Square("Square: " + to_string(countSquare), x, y, side));
+        }
+        else{
+            countTriangle++;
+            shapes.add(new Triangle("Triangle: " + to_string(countTriangle), x, y, side));
         }
     }
-
     cout << "Niit uusgesen dursiin too: " << shapes.length() << endl;
-    cout << "\n--- Talbaigaar erembelegdeegui jagsaalt ---\n" << endl;
-
-    for (int i = 0; i < shapes.length(); i++) {
-        shapes.get(i)->print();
-    }
-
-    sortByArea(shapes);
-
+    sort(shapes);
     cout << "\n--- Talbaigaar eremblegdsen jagsaalt ---\n" << endl;
-
-    for (int i = 0; i < shapes.length(); i++) {
-        shapes.get(i)->print();
+    for (int i = 0; i < shapes.length(); i++){
+        TwoDShape* s = shapes.get(i);
+        cout << i+1 << ". " << s->ner() << "\t" << s->turul()
+             << "\n ~ Talbai: " << s->talbai() << "\n";
     }
-
-    // Санах ой чөлөөлөх
-    for (int i = 0; i < shapes.length(); i++) {
+    for (int i = 0; i < shapes.length(); i++){
         delete shapes.get(i);
     }
-
     return 0;
 }
